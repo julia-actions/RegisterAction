@@ -1,9 +1,11 @@
 const core = require("@actions/core");
 const crypto = require("crypto");
+const fs = require("fs");
 const github = require("@actions/github");
 const semver = require("semver");
 
-const CLIENT = github.getOctokit(core.getInput("token"), { required: true });
+const CLIENT = github.getOctokit(core.getInput("token", { required: true }));
+const EVENT = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH));
 const REPO = {
   owner: process.env.GITHUB_REPOSITORY.split("/")[0],
   repo: process.env.GITHUB_REPOSITORY.split("/")[1],
@@ -28,7 +30,11 @@ const triggerRegistrator = sha => {
 };
 
 const resolveVersion = async () => {
-  const input = core.getInput("version", { required: true }).toLowerCase();
+  let input = EVENT.inputs.version;
+  if (!input) {
+    throw new Error("Missing version input");
+  }
+  input = input.toLowerCase();
   if (!["major", "minor", "patch"].includes(input)) {
     return input;
   }

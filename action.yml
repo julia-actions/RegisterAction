@@ -5,9 +5,6 @@ inputs:
   token:
     description: GitHub API token
     required: true
-  version:
-    description: Version to register or component to bump
-    required: true
 runs:
   using: node12
   main: register.js
