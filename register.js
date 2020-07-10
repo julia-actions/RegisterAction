@@ -21,14 +21,6 @@ const main = async () => {
   console.log(commit.data.commit.html_url);
 };
 
-const triggerRegistrator = sha => {
-  return CLIENT.repos.createCommitComment({
-    ...REPO,
-    commit_sha: sha,
-    body: "@JuliaRegistrator register",
-  });
-};
-
 const resolveVersion = async () => {
   let input = EVENT.inputs.version;
   if (!input) {
@@ -36,6 +28,9 @@ const resolveVersion = async () => {
   }
   input = input.toLowerCase();
   if (!["major", "minor", "patch"].includes(input)) {
+    if (!/^\d+\.\d+\.\d+$/.test(input)) {
+      throw new Error(`Invalid version ${input}`);
+    }
     return input;
   }
   const current = semver.valid(await getVersion());
@@ -82,6 +77,14 @@ const blobSha = contents => {
   const hash = crypto.createHash("sha1");
   hash.update(`blob ${contents.length}\0${contents}`);
   return hash.digest("hex");
+};
+
+const triggerRegistrator = sha => {
+  return CLIENT.repos.createCommitComment({
+    ...REPO,
+    commit_sha: sha,
+    body: "@JuliaRegistrator register",
+  });
 };
 
 if (!module.parent) {
