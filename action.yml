@@ -1,0 +1,16 @@
+name: Register Julia Package
+author: Chris de Graaf
+description: Register your Julia package with Registrator
+inputs:
+  token:
+    description: GitHub API token
+    required: true
+  version:
+    description: Version to register or component to bump
+    required: true
+runs:
+  using: node12
+  main: register.js
+branding:
+  icon: package
+  color: red
