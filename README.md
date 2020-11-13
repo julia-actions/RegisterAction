@@ -1,4 +1,4 @@
-# RebuildAction
+# RegisterAction
 
 Register Julia packages via GitHub Actions.
 
