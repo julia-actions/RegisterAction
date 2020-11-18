@@ -64,12 +64,14 @@ const getVersion = async () => {
 const setVersion = async version => {
   const project = await getProjectToml();
   const updated = project.replace(VERSION_RX, `version = "${version}"`);
+  const branch = process.env.GITHUB_REF.substr(11)  // Remove 'refs/heads/'.
   return CLIENT.repos.createOrUpdateFileContents({
     ...REPO,
     path: "Project.toml",
     message: `Set version to ${version}`,
     content: Buffer.from(updated).toString("base64"),
     sha: blobSha(project),
+    branch: branch,
   });
 };
 
