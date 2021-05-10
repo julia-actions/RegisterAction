@@ -77,7 +77,7 @@ const setVersion = async version => {
 
 const blobSha = contents => {
   const hash = crypto.createHash("sha1");
-  hash.update(`blob ${contents.length}\0${contents}`);
+  hash.update(`blob ${Buffer.from(contents).length}\0${contents}`);
   return hash.digest("hex");
 };
 
