@@ -90,5 +90,8 @@ const triggerRegistrator = sha => {
 };
 
 if (!module.parent) {
-  main();
+  main().catch(e => {
+    console.error(e);
+    process.exit(1);
+  });
 }
