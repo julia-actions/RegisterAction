@@ -5,6 +5,7 @@ const github = require("@actions/github");
 const semver = require("semver");
 
 const CLIENT = github.getOctokit(core.getInput("token", { required: true }));
+const SUBDIR = core.getInput("subdir", { required: false });
 const EVENT = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH));
 const REPO = {
   owner: process.env.GITHUB_REPOSITORY.split("/")[0],
@@ -40,13 +41,15 @@ const resolveVersion = async () => {
   return semver.inc(current, input);
 };
 
+const getProjectTomlPath = () => SUBDIR ? `${SUBDIR}/Project.toml` : "Project.toml";
+
 const getProjectToml = async () => {
   if (PROJECT_TOML) {
     return PROJECT_TOML;
   }
   const content = await CLIENT.repos.getContent({
     ...REPO,
-    path: "Project.toml",
+    path: getProjectTomlPath(),
   });
   PROJECT_TOML = Buffer.from(content.data.content, "base64").toString();
   return PROJECT_TOML;
@@ -67,7 +70,7 @@ const setVersion = async version => {
   const branch = process.env.GITHUB_REF.substr(11)  // Remove 'refs/heads/'.
   return CLIENT.repos.createOrUpdateFileContents({
     ...REPO,
-    path: "Project.toml",
+    path: getProjectTomlPath(),
     message: `Set version to ${version}`,
     content: Buffer.from(updated).toString("base64"),
     sha: blobSha(project),
@@ -81,12 +84,12 @@ const blobSha = contents => {
   return hash.digest("hex");
 };
 
-const triggerRegistrator = sha => {
-  return CLIENT.repos.createCommitComment({
-    ...REPO,
-    commit_sha: sha,
-    body: "@JuliaRegistrator register",
-  });
+const triggerRegistrator = commit_sha => {
+  let body = "JuliaRegistrator register";
+  if (SUBDIR) {
+    body += ` subdir=${SUBDIR}`;
+  }
+  return CLIENT.repos.createCommitComment({ ...REPO, commit_sha, body });
 };
 
 if (!module.parent) {
