@@ -6,8 +6,8 @@ const semver = require("semver");
 
 const CLIENT = github.getOctokit(core.getInput("token", { required: true }));
 const REGISTRATOR = core.getInput("registrator", { required: true });
-const SUBDIR = core.getInput("subdir", { required: false });
 const EVENT = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH));
+const SUBDIR = EVENT.inputs.subdir;
 const REPO = {
   owner: process.env.GITHUB_REPOSITORY.split("/")[0],
   repo: process.env.GITHUB_REPOSITORY.split("/")[1],
