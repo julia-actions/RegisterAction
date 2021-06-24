@@ -46,3 +46,14 @@ on:
 
 Then fill out the value when triggering the action.
 For example, if your `Project.toml` is at `julia/Project.toml`, then give it the value `julia`.
+
+## Private Registries
+
+If you're using an alternate or private registry with the Registrator GitHub App set up on it, then update your workflow file to the following:
+
+```yml
+      - uses: julia-actions/RegisterAction@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          registrator: MyBotUsername
+```

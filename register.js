@@ -5,6 +5,7 @@ const github = require("@actions/github");
 const semver = require("semver");
 
 const CLIENT = github.getOctokit(core.getInput("token", { required: true }));
+const REGISTRATOR = core.getInput("registrator", { required: true });
 const SUBDIR = core.getInput("subdir", { required: false });
 const EVENT = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH));
 const REPO = {
@@ -85,7 +86,7 @@ const blobSha = contents => {
 };
 
 const triggerRegistrator = commit_sha => {
-  let body = "JuliaRegistrator register";
+  let body = `@${REGISTRATOR} register`;
   if (SUBDIR) {
     body += ` subdir=${SUBDIR}`;
   }

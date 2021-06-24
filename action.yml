@@ -5,6 +5,9 @@ inputs:
   token:
     description: GitHub API token
     required: true
+  registrator:
+    description: Registrator bot username
+    default: JuliaRegistrator
 runs:
   using: node12
   main: register.js
