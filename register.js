@@ -8,6 +8,7 @@ const CLIENT = github.getOctokit(core.getInput("token", { required: true }));
 const REGISTRATOR = core.getInput("registrator", { required: true });
 const EVENT = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH));
 const SUBDIR = EVENT.inputs.subdir;
+const BRANCH = process.env.GITHUB_REF.substr(11)  // Remove 'refs/heads/'.
 const REPO = {
   owner: process.env.GITHUB_REPOSITORY.split("/")[0],
   repo: process.env.GITHUB_REPOSITORY.split("/")[1],
@@ -51,6 +52,7 @@ const getProjectToml = async () => {
   const content = await CLIENT.repos.getContent({
     ...REPO,
     path: getProjectTomlPath(),
+    ref: BRANCH,
   });
   PROJECT_TOML = Buffer.from(content.data.content, "base64").toString();
   return PROJECT_TOML;
@@ -68,14 +70,13 @@ const getVersion = async () => {
 const setVersion = async version => {
   const project = await getProjectToml();
   const updated = project.replace(VERSION_RX, `version = "${version}"`);
-  const branch = process.env.GITHUB_REF.substr(11)  // Remove 'refs/heads/'.
   return CLIENT.repos.createOrUpdateFileContents({
     ...REPO,
     path: getProjectTomlPath(),
     message: `Set version to ${version}`,
     content: Buffer.from(updated).toString("base64"),
     sha: blobSha(project),
-    branch: branch,
+    branch: BRANCH,
   });
 };
 
