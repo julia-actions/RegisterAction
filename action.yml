@@ -9,7 +9,7 @@ inputs:
     description: Registrator bot username
     default: JuliaRegistrator
 runs:
-  using: node12
+  using: node16
   main: register.js
 branding:
   icon: package
